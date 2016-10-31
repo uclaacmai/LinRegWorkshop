@@ -11,8 +11,7 @@ class LinReg:
         weight: vertical vector of size + 1
         '''
         assert size > 0
-        self.weight = np.random.normal(scale=0.5, size=(size + 1, 1,))
-        print(self.weight)
+        self._weight = np.random.normal(scale=0.5, size=(size + 1, 1,))
 
     def reshape_inputs(self, inputs):
         return np.append(inputs, np.ones((inputs.shape[0], 1,)), axis=1)
@@ -22,7 +21,7 @@ class LinReg:
         # parameters
         inputs: numpy 2d array where rows are test case vectors
         '''
-        return np.dot(self.reshape_inputs(inputs), self.weight)
+        return np.dot(self.reshape_inputs(inputs), self._weight)
 
     def train(self, inputs, outputs, alpha):
         '''trains weights
@@ -31,10 +30,9 @@ class LinReg:
         outputs: numpy vertical vector of actual outputs
         alpha: training rate
         '''
-        h = run(inputs)
-        delta_weight = np.dot((h - outputs).T, self.reshape_inputs(inputs))*(-alpha/inputs.shape[0])
-        self.weight += delta_weight
-        return self.weight
+        h = self.run(inputs)
+        delta_weight = np.dot(self.reshape_inputs(inputs).T, h - outputs)*(-alpha/inputs.shape[0])
+        self._weight += delta_weight
 
     def cost(self, out_h, out_actual):
         '''computes squared cost
