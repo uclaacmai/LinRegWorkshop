@@ -2,7 +2,7 @@ import numpy as np
 
 
 class LinReg:
-    def __init__(self, size):
+    def __init__(self, size, weightinit=False):
         '''
         # parameters
         size: int of weight length
@@ -11,7 +11,10 @@ class LinReg:
         weight: vertical vector of size + 1
         '''
         assert size > 0
-        self._weight = np.random.normal(size=(size + 1, 1,))
+        if weightinit is not False:
+            self._weight = weightinit
+        else:
+            self._weight = np.random.normal(size=(size + 1, 1,))
 
     def reshape_inputs(self, inputs):
         return np.append(inputs, np.ones((inputs.shape[0], 1,)), axis=1)

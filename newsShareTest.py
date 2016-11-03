@@ -1,5 +1,6 @@
 import csv
 import math as math
+import pickle as pickle
 import numpy as np
 from linreg import LinReg
 
@@ -14,11 +15,22 @@ with open('data/OnlineNewsPopularity.csv') as f:
 
     rows, columns = training_set_inputs.shape
 
-
 training_set_size = rows
-iterations = 2048 * 512
+
+
+#############
+# Variables #
+#############
+
+iterations = 2097152 * 1
 print_rate = 8192
-batch_size = 64
+batch_size = 16
+alpha = 0.001  # default is 0.0001
+reinit = False
+
+#################
+# Normalization #
+#################
 
 normalization_mean = np.array(
     [
@@ -39,10 +51,26 @@ normalization_std_dev = np.array(
         0.24, 0.12, 0.29, 0.09, 0.32, 0.26, 0.18, 0.22
     ], dtype=np.float32)
 
-output_mean = np.mean(training_set_outputs)
-output_std_dev = np.std(training_set_outputs)
+output_mean = 3395
+output_std_dev = 11626
 
-linReg = LinReg(columns)
+
+##################
+# Initialization #
+##################
+
+if reinit:
+    linReg = LinReg(columns)
+else:
+    with open('data/newsshare.p', 'rb') as p:
+        weightinit = pickle.load(p)
+
+        linReg = LinReg(columns, weightinit)
+
+
+############
+# Training #
+############
 
 print('{:>12} | {:<24}'.format('iteration', 'cost'))
 s = ''
@@ -54,13 +82,21 @@ for i in range(iterations):
     k = math.floor(i % training_set_size / batch_size)
     batch = (training_set_inputs[k:k + batch_size] - normalization_mean) / normalization_std_dev
     batch_out = (training_set_outputs[k:k + batch_size] - output_mean) / output_std_dev
-    linReg.train(batch, batch_out, 0.0001)
+    linReg.train(batch, batch_out, alpha)
 
     if(i % print_rate == 0):
         print(
             '{:>12} | {:<24}'
             .format(i, linReg.cost(linReg.run(batch), batch_out)),
             flush=True)
+
+
+########
+# Save #
+########
+
+with open('data/newsshare.p', 'wb') as p:
+    pickle.dump(linReg._weight, p)
 
 # print('final weight')
 # print(linReg._weight)
