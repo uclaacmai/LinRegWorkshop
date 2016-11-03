@@ -24,8 +24,8 @@ training_set_size = rows
 
 iterations = 2097152 * 1
 print_rate = 8192
-batch_size = 16
-alpha = 0.001  # default is 0.0001
+batch_size = 64
+alpha = 0.0001  # default is 0.0001
 reinit = False
 
 #################
@@ -101,7 +101,7 @@ with open('data/newsshare.p', 'wb') as p:
 # print('final weight')
 # print(linReg._weight)
 
-test_range_min = 0
+test_range_min = 32
 test_range_max = test_range_min + 64
 
 print('final test')
