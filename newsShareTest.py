@@ -40,7 +40,7 @@ normalization_std_dev = np.array(
     ], dtype=np.float32)
 
 output_mean = np.mean(training_set_outputs)
-output_std_dev = np.mean(training_set_outputs)
+output_std_dev = np.std(training_set_outputs)
 
 linReg = LinReg(columns)
 
@@ -54,7 +54,7 @@ for i in range(iterations):
     k = math.floor(i % training_set_size / batch_size)
     batch = (training_set_inputs[k:k + batch_size] - normalization_mean) / normalization_std_dev
     batch_out = (training_set_outputs[k:k + batch_size] - output_mean) / output_std_dev
-    linReg.train(batch, batch_out, 0.005)
+    linReg.train(batch, batch_out, 0.0001)
 
     if(i % print_rate == 0):
         print(
@@ -65,15 +65,19 @@ for i in range(iterations):
 # print('final weight')
 # print(linReg._weight)
 
-print('final test')
-test = (linReg.run((training_set_inputs[0:43] - normalization_mean) / normalization_std_dev) * output_std_dev) + output_mean
-out = training_set_outputs[0:43]
+test_range_min = 0
+test_range_max = test_range_min + 64
 
-print('{:>12} | {:<12}'.format('test', 'actual'))
+print('final test')
+test = (linReg.run((training_set_inputs[test_range_min:test_range_max] - normalization_mean) /
+        normalization_std_dev) * output_std_dev) + output_mean
+out = training_set_outputs[test_range_min:test_range_max]
+
+print('{:>12} | {:>12} | {:>12}'.format('test', 'actual', 'difference'))
 s = ''
-for i in range(12 + 12 + 3):
+for i in range(12 + 12 + 12 + 3 * 2):
     s += '-'
 print(s)
 
 for i, j in zip(test.flatten().tolist(), out.flatten().tolist()):
-    print('{:>12} | {:<12}'.format(int(i), int(j)))
+    print('{:>12} | {:>12} | {:>12}'.format(int(i), int(j), int(i - j)))
