@@ -12,10 +12,10 @@ input_range = 16
 training_set_inputs = np.random.uniform(high=input_range, size=(training_set_size, 2,))
 training_set_outputs = training_set_inputs[:, 0, np.newaxis] + 2 * training_set_inputs[:, 1, np.newaxis] + 3
 
-normalization_mean = input_range / 2
-normalization_std_dev = input_range / math.sqrt(12)
-output_mean = np.mean(training_set_outputs)
-output_std_dev = np.std(training_set_outputs)
+normalization_mean = 0
+normalization_std_dev = 1
+output_mean = 0
+output_std_dev = 1
 
 linReg = LinReg(2)
 
