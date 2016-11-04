@@ -26,20 +26,10 @@ training_set_size = rows
 
 iterations = 2048 * 256
 print_rate = 8192
-batch_size = 64
+batch_size = 50
 alpha = 0.0001  # default is 0.0001
-reinit = False
+reinit = True
 save_file_path = 'data/iris.p'
-
-#################
-# Normalization #
-#################
-
-normalization_mean = 0
-normalization_std_dev = 1
-
-output_mean = 0
-output_std_dev = 1
 
 
 ##################
@@ -67,8 +57,8 @@ print(s)
 
 for i in range(iterations):
     k = math.floor(i % training_set_size / batch_size)
-    batch = (training_set_inputs[k:k + batch_size] - normalization_mean) / normalization_std_dev
-    batch_out = (training_set_outputs[k:k + batch_size] - output_mean) / output_std_dev
+    batch = training_set_inputs[k:k + batch_size]
+    batch_out = training_set_outputs[k:k + batch_size]
     linReg.train(batch, batch_out, alpha)
 
     if(i % print_rate == 0):
@@ -92,8 +82,7 @@ test_range_min = 0
 test_range_max = test_range_min + 64
 
 print('final test')
-test = (linReg.run((training_set_inputs[test_range_min:test_range_max] - normalization_mean) /
-        normalization_std_dev) * output_std_dev) + output_mean
+test = linReg.run(training_set_inputs[test_range_min:test_range_max])
 out = training_set_outputs[test_range_min:test_range_max]
 
 print('{:<24} | {:<24} | {:<24}'.format('test', 'actual', 'difference'))
