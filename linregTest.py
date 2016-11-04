@@ -17,17 +17,18 @@ normalization_mean = 0
 normalization_std_dev = 1
 output_mean = 0
 output_std_dev = 1
+draw = True
 
 
 linReg = LinReg(1)
 
-
-plt.ion()
-x_axis = np.linspace(0, input_range)
-fig = plt.figure()
-ax = fig.add_subplot(111)
-line1, = ax.plot(x_axis, linReg._weight[0] * x_axis + linReg._weight[1], 'b-')
-
+if draw:
+    plt.ion()
+    x_axis = np.linspace(0, input_range)
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+    line1, = ax.plot(x_axis, linReg._weight[0] * x_axis + linReg._weight[1], 'b-')
+    iteration_text = ax.text(0, 0, 'iteration: {}'.format(0))
 print('{:>10} | {:<24} | {:<24}'.format('iteration', 'cost', 'test input [[1, 2]]'))
 s = ''
 for i in range(10 + 24 + 24 + 2 * 3):
@@ -40,12 +41,14 @@ for i in range(iterations):
     batch_out = (training_set_outputs[k:k + batch_size] - output_mean) / output_std_dev
     linReg.train(batch, batch_out, 0.0001)
     if(i % print_rate == 0):
+        if draw:
+            ax.scatter(batch.tolist(), batch_out.tolist())
+            line1.set_ydata(linReg._weight[0] * x_axis + linReg._weight[1])
+            iteration_text.set_text('iteration: {}'.format(i))
+            fig.canvas.draw()
         print(
             '{:>10} | {:<24} | {:<24}'
             .format(i, linReg.cost(linReg.run(batch), batch_out), linReg.run(np.array([[2]]))[0, 0], flush=True))
-        ax.scatter(batch.tolist(), batch_out.tolist())
-        line1.set_ydata(linReg._weight[0] * x_axis + linReg._weight[1])
-        fig.canvas.draw()
 
 
 print('final weight')
